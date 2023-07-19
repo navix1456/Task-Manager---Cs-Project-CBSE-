@@ -6,6 +6,12 @@ from PIL import Image, ImageTk  # Import Image and ImageTk from PIL library
 import csv
 import json
 
+# Define a dictionary to map priority levels to colors
+priority_colors = {
+    1: "red",
+    2: "yellow",
+    3: "green"
+}
 
 
 # Replace these values with your MySQL credentials
@@ -237,6 +243,22 @@ def export_to_json():
     with open("task_manager_export.json", "w") as jsonfile:
         json.dump(tasks, jsonfile, indent=4)
 
+def toggle_dark_mode():
+    current_theme = style.theme_use()
+    new_theme = "clam" if current_theme == "plastik" else "plastik"
+    style.set_theme(new_theme)
+
+    # If you want to further customize dark mode appearance, you can do so here
+    if new_theme == "clam":
+        # Dark mode settings
+        root.config(bg="#303030")  # Dark background color
+        # Customize other widgets' colors, text colors, etc. here
+    else:
+        # Default mode settings
+        root.config(bg="white")  # Default background color
+        # Customize other widgets' colors, text colors, etc. here
+
+
 
         
 # Create the main application window
@@ -263,7 +285,6 @@ screen_height = root.winfo_screenheight()
 x = (screen_width - window_width) // 2
 y = (screen_height - window_height) // 2
 root.geometry(f"{window_width}x{window_height}+{x}+{y}")
-
 
 # Load and set the background image
 background_image = Image.open("event-management-wedding-planner-online-manager-planning-event-conference-or-party-professional-organizer-schedule-modern-flat-cartoon-style-illustration-on-white-background-vector.jpg")
@@ -385,6 +406,9 @@ export_csv_button.grid(row=12, column=0, columnspan=2, padx=5, pady=5)
 export_json_button = tk.Button(root, text="Export to JSON", command=export_to_json)
 export_json_button.grid(row=13, column=0, columnspan=2, padx=5, pady=5)
 
+# Define the dark mode button after defining the toggle_dark_mode function
+dark_mode_button = tk.Button(root, text="Dark Mode", command=toggle_dark_mode)
+dark_mode_button.grid(row=14, column=0, columnspan=2, padx=5, pady=5)
 
 
 
