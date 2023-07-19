@@ -3,6 +3,8 @@ from tkinter import ttk
 import mysql.connector
 from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk  # Import Image and ImageTk from PIL library
+import csv
+import json
 
 
 
@@ -176,8 +178,67 @@ def clear_search():
     search_entry.delete(0, tk.END)
     priority_var_search.set(0)
     update_task_list()
-    
 
+
+def fetch_tasks_from_database():
+    try:
+        # Connect to the database
+        connection = mysql.connector.connect(
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DATABASE
+        )
+
+        # Fetch tasks from the database
+        cursor = connection.cursor()
+        query = "SELECT id, date_added, title, description, due_date, priority, status FROM tasks ORDER BY priority DESC"
+        cursor.execute(query)
+        tasks = cursor.fetchall()
+
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+        return tasks
+
+    except mysql.connector.Error as e:
+        print(f"Error fetching tasks from the database: {e}")
+        return []
+
+
+
+def export_to_csv():
+    tasks = fetch_tasks_from_database()
+
+    # Convert the list of tuples to a list of dictionaries
+    task_dicts = []
+    for task in tasks:
+        task_dict = {
+            "ID": task[0],
+            "Date Added": task[1],
+            "Title": task[2],
+            "Description": task[3],
+            "Due Date": task[4],
+            "Priority": task[5],
+            "Status": task[6]
+        }
+        task_dicts.append(task_dict)
+
+    # Write the list of dictionaries to CSV
+    with open("task_manager_export.csv", "w", newline="") as csvfile:
+        fieldnames = ["ID", "Date Added", "Title", "Description", "Due Date", "Priority", "Status"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(task_dicts)
+
+def export_to_json():
+    tasks = fetch_tasks_from_database()
+    with open("task_manager_export.json", "w") as jsonfile:
+        json.dump(tasks, jsonfile, indent=4)
+
+
+        
 # Create the main application window
 root = tk.Tk()
 root.title("Task Manager")
@@ -316,6 +377,14 @@ search_button.grid(row=10, column=0, columnspan=2, padx=5, pady=5)
 
 clear_search_button = tk.Button(root, text="Clear Search", command=clear_search)
 clear_search_button.grid(row=11, column=0, columnspan=2, padx=5, pady=5)
+
+#export csv
+export_csv_button = tk.Button(root, text="Export to CSV", command=export_to_csv)
+export_csv_button.grid(row=12, column=0, columnspan=2, padx=5, pady=5)
+
+export_json_button = tk.Button(root, text="Export to JSON", command=export_to_json)
+export_json_button.grid(row=13, column=0, columnspan=2, padx=5, pady=5)
+
 
 
 
