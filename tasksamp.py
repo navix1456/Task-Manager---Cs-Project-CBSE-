@@ -190,6 +190,39 @@ def export_to_csv():
         writer.writeheader()
         writer.writerows(task_dicts)
 
+def update_task_status(task_id, new_status):
+    # Connect to MySQL database
+    connection = mysql.connector.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DATABASE
+    )
+
+    # Update task status in the database
+    cursor = connection.cursor()
+    query = "UPDATE tasks SET status = %s WHERE id = %s"
+    values = (new_status, task_id)
+    cursor.execute(query, values)
+    connection.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+
+# ... (your existing code for creating the task_tree)
+
+def mark_as_completed():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+
+    task_id = task_tree.item(selected_item)['values'][0]
+    update_task_status(task_id, "Completed")
+    update_task_list()
+
+
+
 
 
         
@@ -267,6 +300,10 @@ status_combobox.grid(row=4, column=1, padx=5, pady=5)
 
 add_button = tk.Button(root, text="Add Task", command=create_task)
 add_button.grid(row=5, column=0, columnspan=2, padx=5, pady=10)
+
+
+mark_as_completed_button = tk.Button(root, text="Mark as Completed", command=mark_as_completed)
+mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
 
 
 # Task List View Section
