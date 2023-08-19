@@ -430,12 +430,29 @@ task_tree.column("#7", anchor="center", width=100)
 task_tree.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 
 
+
+
+
+# Create the menu bar
+menu_bar = tk.Menu(root)
+root.config(menu=menu_bar)
+
+# Create a "Task" menu
+task_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Task", menu=task_menu)
+
+# Add a menu item for "Delete Task"
+task_menu.add_command(label="Delete Task", command=confirm_delete_task, accelerator="Ctrl+D")
+root.bind("<Control-d>", lambda event: confirm_delete_task())
+
+
+
 # Task Deletion Buttons
-delete_button = tk.Button(root, text="Delete Task", command=delete_task)
-delete_button.grid(row=7, column=0, padx=5, pady=5)
 
 delete_button = tk.Button(root, text="Delete Task", command=confirm_delete_task)
 delete_button.grid(row=7, column=0, padx=5, pady=5)
+
+
 
 
 
