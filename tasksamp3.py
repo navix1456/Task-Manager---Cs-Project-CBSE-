@@ -237,6 +237,22 @@ def mark_as_completed():
     update_task_status(task_id, "Completed")
     update_task_list()
 
+
+def confirm_mark_as_completed():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+    
+    # Get the task title of the selected item
+    task_title = task_tree.item(selected_item)['values'][2]
+    
+    # Show a confirmation dialog
+    confirm = tk.messagebox.askyesno("Confirm Mark as Completed", f"Are you sure you want to mark the task '{task_title}' as completed?")
+    if confirm:
+        mark_as_completed()
+
+
+
 def show_date_picker():
     selected_date = DateEntry(root, date_pattern="yyyy-mm-dd")
     selected_date.grid(row=2, column=2, padx=5, pady=5)
@@ -380,8 +396,14 @@ add_button.grid(row=5, column=0, columnspan=2, padx=5, pady=10)
 mark_as_completed_button = tk.Button(root, text="Mark as Completed", command=mark_as_completed)
 mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
 
+mark_as_completed_button = tk.Button(root, text="Mark as Completed", command=confirm_mark_as_completed)
+mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
+
+
 date_picker_button = tk.Button(root, text="Select Due Date", command=show_date_picker)
 date_picker_button.grid(row=2, column=2, padx=5, pady=5)
+
+
 
 
 # Task List View Section
