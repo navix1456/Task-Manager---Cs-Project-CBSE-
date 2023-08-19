@@ -6,13 +6,8 @@ from PIL import Image, ImageTk  # Import Image and ImageTk from PIL library
 import csv
 from tkinter import simpledialog
 from tkcalendar import DateEntry
-from tkinter import messagebox
 
 
-
-# Create the main application window
-root = tk.Tk()
-root.title("Task Manager")
 
 # Replace these values with your MySQL credentials
 MYSQL_HOST = "localhost"
@@ -77,9 +72,6 @@ def update_task_list():
     # Insert tasks into the treeview
     for task in tasks:
         task_tree.insert("", "end", values=task)
-
-    # Update task counts
-    update_task_counts()
         
 
 def delete_task():
@@ -110,18 +102,6 @@ def delete_task():
     
 
 
-def confirm_delete_task():
-    selected_item = task_tree.selection()
-    if not selected_item:
-        return
-    
-    # Get the task title of the selected item
-    task_title = task_tree.item(selected_item)['values'][2]
-    
-    # Show a confirmation dialog
-    confirm = tk.messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete the task '{task_title}'?")
-    if confirm:
-        delete_task()
     
 
 def search_task():
@@ -243,22 +223,6 @@ def mark_as_completed():
     update_task_status(task_id, "Completed")
     update_task_list()
 
-
-def confirm_mark_as_completed():
-    selected_item = task_tree.selection()
-    if not selected_item:
-        return
-    
-    # Get the task title of the selected item
-    task_title = task_tree.item(selected_item)['values'][2]
-    
-    # Show a confirmation dialog
-    confirm = tk.messagebox.askyesno("Confirm Mark as Completed", f"Are you sure you want to mark the task '{task_title}' as completed?")
-    if confirm:
-        mark_as_completed()
-
-
-
 def show_date_picker():
     selected_date = DateEntry(root, date_pattern="yyyy-mm-dd")
     selected_date.grid(row=2, column=2, padx=5, pady=5)
@@ -321,52 +285,11 @@ def calendar_dialog():
     return selected_date
 
 
-# Define and create labels for task counts
-total_tasks_label = tk.Label(root, text="Total Tasks:")
-total_tasks_label.grid(row=13, column=0, padx=5, pady=5)
-total_tasks_count_label = tk.Label(root, text="0")
-total_tasks_count_label.grid(row=13, column=1, padx=5, pady=5)
-
-completed_tasks_label = tk.Label(root, text="Completed Tasks:")
-completed_tasks_label.grid(row=14, column=0, padx=5, pady=5)
-completed_tasks_count_label = tk.Label(root, text="0")
-completed_tasks_count_label.grid(row=14, column=1, padx=5, pady=5)
-
-in_progress_tasks_label = tk.Label(root, text="In-Progress Tasks:")
-in_progress_tasks_label.grid(row=15, column=0, padx=5, pady=5)
-in_progress_tasks_count_label = tk.Label(root, text="0")
-in_progress_tasks_count_label.grid(row=15, column=1, padx=5, pady=5)
-
-
-# Add labels for task counts
-total_tasks_label = tk.Label(root, text="Total Tasks:")
-total_tasks_label.grid(row=12, column=0, padx=5, pady=5)
-
-completed_tasks_label = tk.Label(root, text="Completed Tasks:")
-completed_tasks_label.grid(row=13, column=0, padx=5, pady=5)
-
-in_progress_tasks_label = tk.Label(root, text="In-Progress Tasks:")
-in_progress_tasks_label.grid(row=14, column=0, padx=5, pady=5)
-
-
-# Your functions...
-
-def update_task_counts():
-    tasks = fetch_tasks_from_database()
-    total_tasks = len(tasks)
-    completed_tasks = sum(1 for task in tasks if task[6] == "Completed")
-    in_progress_tasks = total_tasks - completed_tasks
-
-    total_tasks_count_label.config(text=str(total_tasks))
-    completed_tasks_count_label.config(text=str(completed_tasks))
-    in_progress_tasks_count_label.config(text=str(in_progress_tasks))
-
-# ... (your existing code)
-
-
 
         
-
+# Create the main application window
+root = tk.Tk()
+root.title("Task Manager")
 
 
 # Apply the themed style
@@ -443,16 +366,8 @@ add_button.grid(row=5, column=0, columnspan=2, padx=5, pady=10)
 mark_as_completed_button = tk.Button(root, text="Mark as Completed", command=mark_as_completed)
 mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
 
-mark_as_completed_button = tk.Button(root, text="Mark as Completed", command=confirm_mark_as_completed)
-mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
-
-
 date_picker_button = tk.Button(root, text="Select Due Date", command=show_date_picker)
 date_picker_button.grid(row=2, column=2, padx=5, pady=5)
-
-# Create buttons to update task counts
-update_task_counts_button = tk.Button(root, text="Update Task Counts", command=update_task_counts)
-update_task_counts_button.grid(row=8, column=2, padx=5, pady=5)
 
 
 # Task List View Section
@@ -482,10 +397,6 @@ task_tree.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 # Task Deletion Buttons
 delete_button = tk.Button(root, text="Delete Task", command=delete_task)
 delete_button.grid(row=7, column=0, padx=5, pady=5)
-
-delete_button = tk.Button(root, text="Delete Task", command=confirm_delete_task)
-delete_button.grid(row=7, column=0, padx=5, pady=5)
-
 
 
 
@@ -520,10 +431,6 @@ search_button.grid(row=10, column=0, columnspan=2, padx=5, pady=5)
 clear_search_button = tk.Button(root, text="Clear Search", command=clear_search)
 clear_search_button.grid(row=11, column=0, columnspan=2, padx=5, pady=5)
 
-
-
-
-
 #export csv
 export_csv_button = tk.Button(root, text="Export to CSV", command=export_to_csv)
 export_csv_button.grid(row=12, column=0, columnspan=2, padx=5, pady=5)
@@ -531,6 +438,25 @@ export_csv_button.grid(row=12, column=0, columnspan=2, padx=5, pady=5)
 
 
 
+
+
+
+# Delete Task Shortcut (Ctrl + D)
+def delete_selected(event):
+    delete_task()
+
+root.bind("<Control-d>", delete_selected)
+
+# Mark as Completed Shortcut (Ctrl + C)
+def mark_completed(event):
+    mark_as_completed()
+
+root.bind("<Control-c>", mark_completed)
+
+# Set window icon
+window_icon = Image.open("download (1).png")
+window_icon = ImageTk.PhotoImage(window_icon)
+root.iconphoto(True, window_icon)
 
 
 
