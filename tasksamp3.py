@@ -7,6 +7,12 @@ import csv
 from tkinter import simpledialog
 from tkcalendar import DateEntry
 import tkinter.messagebox as messagebox
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.platypus.paragraph import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+
 
 # Create the main application window
 root = tk.Tk()
@@ -334,6 +340,40 @@ def mark_as_completed():
 root.bind("<Control-c>", mark_as_completed)
 
 
+def export_to_pdf():
+    tasks = fetch_tasks_from_database()
+
+    # Create a PDF document
+    doc = SimpleDocTemplate("task_manager_export.pdf", pagesize=letter)
+    elements = []
+
+    # Create a table to hold task data
+    data = [
+        ["ID", "Date Added", "Title", "Description", "Due Date", "Priority", "Status"]
+    ]
+    for task in tasks:
+        data.append(task)
+
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    # Add the table to the PDF document
+    elements.append(table)
+
+    # Build the PDF document
+    doc.build(elements)
+
+
+
+
 
 
 # Apply the themed style
@@ -412,6 +452,10 @@ mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
 
 date_picker_button = tk.Button(root, text="Select Due Date", command=show_date_picker)
 date_picker_button.grid(row=2, column=2, padx=5, pady=5)
+
+# Add a button to export tasks to PDF
+export_pdf_button = tk.Button(root, text="Export to PDF", command=export_to_pdf)
+export_pdf_button.grid(row=12, column=0, padx=5, pady=5)
 
 
 # Task List View Section
