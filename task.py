@@ -4,14 +4,7 @@ import mysql.connector
 from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk  # Import Image and ImageTk from PIL library
 import csv
-import json
 
-# Define a dictionary to map priority levels to colors
-priority_colors = {
-    1: "red",
-    2: "yellow",
-    3: "green"
-}
 
 
 # Replace these values with your MySQL credentials
@@ -238,13 +231,6 @@ def export_to_csv():
         writer.writeheader()
         writer.writerows(task_dicts)
 
-def export_to_json():
-    tasks = fetch_tasks_from_database()
-    with open("task_manager_export.json", "w") as jsonfile:
-        json.dump(tasks, jsonfile, indent=4)
-
-
-
 
 
         
@@ -390,8 +376,7 @@ clear_search_button.grid(row=11, column=0, columnspan=2, padx=5, pady=5)
 export_csv_button = tk.Button(root, text="Export to CSV", command=export_to_csv)
 export_csv_button.grid(row=12, column=0, columnspan=2, padx=5, pady=5)
 
-export_json_button = tk.Button(root, text="Export to JSON", command=export_to_json)
-export_json_button.grid(row=13, column=0, columnspan=2, padx=5, pady=5)
+
 
 
 
