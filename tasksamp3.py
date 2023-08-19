@@ -10,6 +10,9 @@ from tkinter import messagebox
 
 
 
+# Create the main application window
+root = tk.Tk()
+root.title("Task Manager")
 
 # Replace these values with your MySQL credentials
 MYSQL_HOST = "localhost"
@@ -74,6 +77,9 @@ def update_task_list():
     # Insert tasks into the treeview
     for task in tasks:
         task_tree.insert("", "end", values=task)
+
+    # Update task counts
+    update_task_counts()
         
 
 def delete_task():
@@ -315,11 +321,52 @@ def calendar_dialog():
     return selected_date
 
 
+# Define and create labels for task counts
+total_tasks_label = tk.Label(root, text="Total Tasks:")
+total_tasks_label.grid(row=13, column=0, padx=5, pady=5)
+total_tasks_count_label = tk.Label(root, text="0")
+total_tasks_count_label.grid(row=13, column=1, padx=5, pady=5)
+
+completed_tasks_label = tk.Label(root, text="Completed Tasks:")
+completed_tasks_label.grid(row=14, column=0, padx=5, pady=5)
+completed_tasks_count_label = tk.Label(root, text="0")
+completed_tasks_count_label.grid(row=14, column=1, padx=5, pady=5)
+
+in_progress_tasks_label = tk.Label(root, text="In-Progress Tasks:")
+in_progress_tasks_label.grid(row=15, column=0, padx=5, pady=5)
+in_progress_tasks_count_label = tk.Label(root, text="0")
+in_progress_tasks_count_label.grid(row=15, column=1, padx=5, pady=5)
+
+
+# Add labels for task counts
+total_tasks_label = tk.Label(root, text="Total Tasks:")
+total_tasks_label.grid(row=12, column=0, padx=5, pady=5)
+
+completed_tasks_label = tk.Label(root, text="Completed Tasks:")
+completed_tasks_label.grid(row=13, column=0, padx=5, pady=5)
+
+in_progress_tasks_label = tk.Label(root, text="In-Progress Tasks:")
+in_progress_tasks_label.grid(row=14, column=0, padx=5, pady=5)
+
+
+# Your functions...
+
+def update_task_counts():
+    tasks = fetch_tasks_from_database()
+    total_tasks = len(tasks)
+    completed_tasks = sum(1 for task in tasks if task[6] == "Completed")
+    in_progress_tasks = total_tasks - completed_tasks
+
+    total_tasks_count_label.config(text=str(total_tasks))
+    completed_tasks_count_label.config(text=str(completed_tasks))
+    in_progress_tasks_count_label.config(text=str(in_progress_tasks))
+
+# ... (your existing code)
+
+
 
         
-# Create the main application window
-root = tk.Tk()
-root.title("Task Manager")
+
 
 
 # Apply the themed style
@@ -403,7 +450,9 @@ mark_as_completed_button.grid(row=7, column=1, padx=5, pady=5)
 date_picker_button = tk.Button(root, text="Select Due Date", command=show_date_picker)
 date_picker_button.grid(row=2, column=2, padx=5, pady=5)
 
-
+# Create buttons to update task counts
+update_task_counts_button = tk.Button(root, text="Update Task Counts", command=update_task_counts)
+update_task_counts_button.grid(row=8, column=2, padx=5, pady=5)
 
 
 # Task List View Section
@@ -430,29 +479,12 @@ task_tree.column("#7", anchor="center", width=100)
 task_tree.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 
 
-
-
-
-# Create the menu bar
-menu_bar = tk.Menu(root)
-root.config(menu=menu_bar)
-
-# Create a "Task" menu
-task_menu = tk.Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label="Task", menu=task_menu)
-
-# Add a menu item for "Delete Task"
-task_menu.add_command(label="Delete Task", command=confirm_delete_task, accelerator="Ctrl+D")
-root.bind("<Control-d>", lambda event: confirm_delete_task())
-
-
-
 # Task Deletion Buttons
+delete_button = tk.Button(root, text="Delete Task", command=delete_task)
+delete_button.grid(row=7, column=0, padx=5, pady=5)
 
 delete_button = tk.Button(root, text="Delete Task", command=confirm_delete_task)
 delete_button.grid(row=7, column=0, padx=5, pady=5)
-
-
 
 
 
@@ -487,6 +519,10 @@ search_button.grid(row=10, column=0, columnspan=2, padx=5, pady=5)
 
 clear_search_button = tk.Button(root, text="Clear Search", command=clear_search)
 clear_search_button.grid(row=11, column=0, columnspan=2, padx=5, pady=5)
+
+
+
+
 
 #export csv
 export_csv_button = tk.Button(root, text="Export to CSV", command=export_to_csv)
