@@ -401,6 +401,89 @@ def display_statistics():
 
 
 
+def edit_selected_task():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+
+    task_id = task_tree.item(selected_item)['values'][0]
+
+    connection = mysql.connector.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DATABASE
+    )
+
+    cursor = connection.cursor()
+    query = "SELECT * FROM tasks WHERE id = %s"
+    cursor.execute(query, (task_id,))
+    task_data = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    if task_data:
+        # Open a dialog box for editing task fields
+        edit_dialog = tk.Toplevel(root)
+        edit_dialog.title("Edit Task")
+
+        # Create and place input fields for each task attribute
+        tk.Label(edit_dialog, text="Title:").grid(row=0, column=0, padx=5, pady=5)
+        title_entry_edit = tk.Entry(edit_dialog)
+        title_entry_edit.insert(0, task_data[2])
+        title_entry_edit.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(edit_dialog, text="Description:").grid(row=1, column=0, padx=5, pady=5)
+        description_text_edit = tk.Text(edit_dialog, height=5, width=30)
+        description_text_edit.insert("1.0", task_data[3])
+        description_text_edit.grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Label(edit_dialog, text="Due Date:").grid(row=2, column=0, padx=5, pady=5)
+        due_date_entry_edit = tk.Entry(edit_dialog)
+        due_date_entry_edit.insert(0, task_data[4])
+        due_date_entry_edit.grid(row=2, column=1, padx=5, pady=5)
+
+        tk.Label(edit_dialog, text="Priority:").grid(row=3, column=0, padx=5, pady=5)
+        priority_var_edit = tk.StringVar(edit_dialog)
+        priority_combobox_edit = ttk.Combobox(edit_dialog, textvariable=priority_var_edit, values=[1, 2, 3])
+        priority_combobox_edit.set(task_data[5])
+        priority_combobox_edit.grid(row=3, column=1, padx=5, pady=5)
+
+        tk.Label(edit_dialog, text="Status:").grid(row=4, column=0, padx=5, pady=5)
+        status_var_edit = tk.StringVar(edit_dialog)
+        status_combobox_edit = ttk.Combobox(edit_dialog, textvariable=status_var_edit,
+                                            values=["Not Started", "In Progress", "Completed"])
+        status_combobox_edit.set(task_data[6])
+        status_combobox_edit.grid(row=4, column=1, padx=5, pady=5)
+
+        # Update the task when "Save" button is clicked
+        def save_edited_task():
+            new_title = title_entry_edit.get()
+            new_description = description_text_edit.get("1.0", tk.END)
+            new_due_date = due_date_entry_edit.get()
+            new_priority = priority_var_edit.get()
+            new_status = status_var_edit.get()
+
+            connection = mysql.connector.connect(
+                host=MYSQL_HOST,
+                user=MYSQL_USER,
+                password=MYSQL_PASSWORD,
+                database=MYSQL_DATABASE
+            )
+
+            cursor = connection.cursor()
+            query = "UPDATE tasks SET title=%s, description=%s, due_date=%s, priority=%s, status=%s WHERE id=%s"
+            cursor.execute(query, (new_title, new_description, new_due_date, new_priority, new_status, task_id))
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+            edit_dialog.destroy()  # Close the edit dialog
+            update_task_list()  # Update the task list in the main window
+
+        # Add a "Save" button to save the edited task
+        save_button = tk.Button(edit_dialog, text="Save", command=save_edited_task)
+        save_button.grid(row=5, columnspan=2, padx=5, pady=10)
 
 
 
@@ -492,6 +575,10 @@ export_pdf_button.grid(row=12, column=0, padx=5, pady=5)
 #show statistics
 stats_button = tk.Button(root, text="Show Statistics", command=display_statistics)
 stats_button.grid(row=13, column=2, padx=5, pady=5)
+
+# Add "Edit Task" Button
+edit_task_button = tk.Button(root, text="Edit Task", command=edit_selected_task)
+edit_task_button.grid(row=14, column=1, padx=5, pady=5)
 
 
 
