@@ -59,6 +59,14 @@ def create_task():
     due_date_entry.delete(0, tk.END)
     
 
+# Define priority colors
+PRIORITY_COLORS = {
+    1: "red",      # High priority
+    2: "yellow",   # Medium priority
+    3: "green"     # Low priority
+}
+
+
 def update_task_list():
     # Clear existing tasks from the treeview
     for item in task_tree.get_children():
@@ -76,11 +84,16 @@ def update_task_list():
     query = "SELECT id, date_added, title, description, due_date, priority, status FROM tasks ORDER BY priority DESC"
     cursor.execute(query)
     tasks = cursor.fetchall()
-    
 
-    # Insert tasks into the treeview
+    # Insert tasks into the treeview with priority color indicators
     for task in tasks:
-        task_tree.insert("", "end", values=task)
+        priority = task[5]
+        priority_color = PRIORITY_COLORS.get(priority, "black")  # Default to black if priority is not defined
+        task_tree.insert("", "end", values=task, tags=(priority_color,))
+
+    # Apply tag configuration for priority color indicators
+    for color in PRIORITY_COLORS.values():
+        task_tree.tag_configure(color, background=color)
         
 
 def delete_task():
