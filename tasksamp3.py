@@ -6,8 +6,11 @@ from PIL import Image, ImageTk  # Import Image and ImageTk from PIL library
 import csv
 from tkinter import simpledialog
 from tkcalendar import DateEntry
+import tkinter.messagebox as messagebox
 
-
+# Create the main application window
+root = tk.Tk()
+root.title("Task Manager")
 
 # Replace these values with your MySQL credentials
 MYSQL_HOST = "localhost"
@@ -284,12 +287,53 @@ def calendar_dialog():
 
     return selected_date
 
-
-
+def delete_task():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+    
+    # Ask for confirmation
+    confirmation = messagebox.askyesno("Confirm Deletion", "Are you sure you want to delete this task?")
+    if confirmation:
+        # Get the task id of the selected item
+        task_id = task_tree.item(selected_item)['values'][0]
+    
+        # Connect to the database
+        connection = mysql.connector.connect(
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DATABASE
+        )
+    
+        cursor = connection.cursor()
+        query = "DELETE FROM tasks WHERE id = %s"
+        cursor.execute(query, (task_id,))
+        connection.commit()
+    
+        # Update task list after deletion
+        update_task_list()
         
-# Create the main application window
-root = tk.Tk()
-root.title("Task Manager")
+
+root.bind("<Control-d>", delete_task)
+
+
+
+def mark_as_completed():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+    
+    # Ask for confirmation
+    confirmation = messagebox.askyesno("Confirm Mark as Completed", "Are you sure you want to mark this task as completed?")
+    if confirmation:
+        task_id = task_tree.item(selected_item)['values'][0]
+        update_task_status(task_id, "Completed")
+        update_task_list()
+
+root.bind("<Control-c>", mark_as_completed)
+
+
 
 
 # Apply the themed style
