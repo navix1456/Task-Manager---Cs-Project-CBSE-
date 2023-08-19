@@ -102,6 +102,18 @@ def delete_task():
     
 
 
+def confirm_delete_task():
+    selected_item = task_tree.selection()
+    if not selected_item:
+        return
+    
+    # Get the task title of the selected item
+    task_title = task_tree.item(selected_item)['values'][2]
+    
+    # Show a confirmation dialog
+    confirm = tk.messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete the task '{task_title}'?")
+    if confirm:
+        delete_task()
     
 
 def search_task():
@@ -397,6 +409,10 @@ task_tree.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 # Task Deletion Buttons
 delete_button = tk.Button(root, text="Delete Task", command=delete_task)
 delete_button.grid(row=7, column=0, padx=5, pady=5)
+
+delete_button = tk.Button(root, text="Delete Task", command=confirm_delete_task)
+delete_button.grid(row=7, column=0, padx=5, pady=5)
+
 
 
 
