@@ -372,6 +372,38 @@ def export_to_pdf():
     doc.build(elements)
 
 
+def display_statistics():
+    connection = mysql.connector.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DATABASE
+    )
+
+    cursor = connection.cursor()
+    query = "SELECT COUNT(*) FROM tasks"
+    cursor.execute(query)
+    total_tasks = cursor.fetchone()[0]
+
+    query = "SELECT COUNT(*) FROM tasks WHERE status = 'Completed'"
+    cursor.execute(query)
+    completed_tasks = cursor.fetchone()[0]
+
+    query = "SELECT COUNT(*) FROM tasks WHERE status = 'In Progress'"
+    cursor.execute(query)
+    in_progress_tasks = cursor.fetchone()[0]
+
+    cursor.close()
+    connection.close()
+
+    statistics_text = f"Total Tasks: {total_tasks}\nCompleted Tasks: {completed_tasks}\nIn Progress Tasks: {in_progress_tasks}"
+    messagebox.showinfo("Task Statistics", statistics_text)
+
+
+
+
+
+
 
 
 
@@ -456,6 +488,15 @@ date_picker_button.grid(row=2, column=2, padx=5, pady=5)
 # Add a button to export tasks to PDF
 export_pdf_button = tk.Button(root, text="Export to PDF", command=export_to_pdf)
 export_pdf_button.grid(row=12, column=0, padx=5, pady=5)
+
+#show statistics
+stats_button = tk.Button(root, text="Show Statistics", command=display_statistics)
+stats_button.grid(row=13, column=2, padx=5, pady=5)
+
+
+
+
+
 
 
 # Task List View Section
